@@ -1,5 +1,7 @@
 Contains code for simulations in Popov, Ostarek & Tenison (2018) Inferential Pitfalls in Neural Decoding.
 
+Preprint: https://www.biorxiv.org/content/early/2017/10/16/141283
+
 All code runs under the following R, OS and packages versions:
 
 ```
