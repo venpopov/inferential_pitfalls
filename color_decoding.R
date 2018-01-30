@@ -9,7 +9,7 @@ library(caret)
 library(reshape2)
 library(plotly)
 library(gridExtra)
-source('analyses/functions.R')
+source('functions.R')
 
 # --------------------------------------------------------------------------
 # GENERATE DATA
