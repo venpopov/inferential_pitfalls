@@ -30,6 +30,20 @@ encoding_model <- function(response, predictors, nFolds=10) {
   return(pred)
 }
 
+# function to transform a decimal number into a binary vector with length nFeat
+dec2bin = function(number, nFeat=32) {
+  binary_vector = rev(as.numeric(intToBits(number)))
+  binary_vector[-(1:(length(binary_vector) - nFeat))]
+}
+
+# function to transform a number into a vector of length nFeat
+num2vect <- function(number, nFeat) {
+  aschar <- as.character(number)
+  vector <- as.numeric(unlist(strsplit(aschar,'')))
+  vector <- c(rep(0, nFeat-length(vector)), vector)
+  return(vector)
+}
+
 
 # function for calculating percentile rank
 get_percentile_rank_acc <- function(obs, pred) {
