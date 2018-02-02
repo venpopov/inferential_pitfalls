@@ -2,6 +2,8 @@ Contains code for simulations in Popov, Ostarek & Tenison (2018) Inferential Pit
 
 Preprint: https://www.biorxiv.org/content/early/2017/10/16/141283
 
+Code runs with paths relative to the parent folder, which is set-up in every script by the here() package and the setwd(here()) command, which finds the .Rproj file and sets that as the working dir.
+
 All code runs under the following R, OS and packages versions:
 
 ```
