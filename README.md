@@ -1,4 +1,4 @@
-Contains code for simulations in Popov, Ostarek & Tenison (2018) Inferential Pitfalls in Neural Decoding.
+Contains code for simulations in Popov, Ostarek & Tenison (2018) Practices and Pitfalls in Inferring Neural Representations.
 
 Preprint: https://www.biorxiv.org/content/early/2017/10/16/141283
 
