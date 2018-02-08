@@ -76,3 +76,18 @@ sim_res %>%
 
 ggsave('figures/attentional_modulation_par_space.tiff', units='in', width=7.5, height=8, compression="lzw")
 
+
+# --------------------------------------------------------------------------
+# ILLUSTRATIVE FIGURE
+# --------------------------------------------------------------------------
+
+dim_value <- seq(0,1,0.001)
+prefered <- seq(0.1,0.9,0.2)
+width_sd <- 1
+width_sd_att <- 0.5
+
+# data
+dat <- data.frame(value = dim_value, 
+                  noatt = dnorm(dim_value, prefered, width_sd),
+                  att = dnorm(dim_value, prefered, width_sd_att)) %>% 
+  gather(att_condition, resp, noatt, att)

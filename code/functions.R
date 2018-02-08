@@ -1,5 +1,5 @@
 # function for training and testing a linear encoding model with cross-validation
-encoding_model <- function(response, predictors, nFolds=10) {
+encoding_model <- function(response, model, nFolds=10, ...) {
   N_resp <- dim(response)[2] 
   ids = 1:nrow(response)
   pred <- list()
@@ -18,7 +18,7 @@ encoding_model <- function(response, predictors, nFolds=10) {
     # the test set in fitted
     for (i in 1:N_resp) {
       Y <- response[,i]
-      X <- predictors
+      X <- model
       lm.fit[[k]][[i]] <- lm(Y ~ ., data=X, subset=train_ids)
       fitted[,i+1] <- predict(lm.fit[[k]][[i]], data.frame(X[-train_ids,]), type="response")
     }
@@ -64,3 +64,63 @@ get_percentile_rank_acc <- function(obs, pred) {
   }
   return(prank)
 }
+
+# function for getting voxel activations by setting preferred value for each
+# neuron/voxel, and getting a response based on a normal distribution centered
+# around that prefered value with a selectivity_sd as the std. The noise_sd
+# specifies the sd of gausian noise added to each voxel activation
+population_code_response <- function(att, ...) {
+  nDimensions = ncol(repr)
+  nVoxels <- length(prefered)
+  nObs <- dim(repr)[1]
+  voxels <- c()
+  
+  # loop over dimensions in the representational space. Get gaussian response to
+  # stimulus based on prefered value and add gaussian noise
+  for (i in 1:nDimensions) {
+    # if attention is modulated towards the current dimension, increase selectivity:
+    selectivity_sd_actual = ifelse(i == att, att_selectivity_sd, selectivity_sd)
+    
+    dim <- repr[,i]
+    voxels_dim <- sapply(prefered, function(x) dnorm(dim, mean=x, sd=selectivity_sd_actual))
+    noise <- rnorm(nObs*nVoxels, sd=noise_sd) %>% matrix(nrow=nObs)
+    voxels_dim <- round(voxels_dim + noise, 2)
+    voxels <- cbind(voxels, voxels_dim)
+  }
+  return(voxels)
+}
+
+# workflow function toget population code response, fit encoding model and extract percential rank accuracy
+run_simulation <- function(...) {
+  voxels <- population_code_response(...)
+  pred <- encoding_model(voxels, ...)
+  prank <- get_percentile_rank_acc(voxels, pred)
+  acc <- mean(unlist(prank))  
+  return(acc)
+}
+
+# function for running all models and conditions and returning the accuracy for each
+run_color_simulation <- function(selectivity_sd, noise_sd, att_selectivity_sd) {
+  acc <<- rep(0, 8)
+  prefered <<- c(0.1,0.3,0.5,0.7,0.9)
+  repr <<- vrgb[1:3]
+  att_selectivity_sd <<- att_selectivity_sd
+  selectivity_sd <<- selectivity_sd
+  noise_sd <<- noise_sd
+  
+  
+  acc[1] <- run_simulation(model=vrgb[1:3],att=0) # no attention
+  acc[2] <- run_simulation(model=vrgb[1:3],att=1) # r attention
+  acc[3] <- run_simulation(model=vrgb[1:3],att=2) # g attention
+  acc[4] <- run_simulation(model=vrgb[1:3],att=3) # b attention
+  acc[5] <- run_simulation(model=vhsv[1:3],att=0) # no attention
+  acc[6] <- run_simulation(model=vhsv[1:3],att=1) # r attention
+  acc[7] <- run_simulation(model=vhsv[1:3],att=2) # g attention
+  acc[8] <- run_simulation(model=vhsv[1:3],att=3) # b attention
+  
+  res <- data.frame(att = rep(c('control','r','g','b'),2),
+                    model = rep(c('rgb','hsv'), each=4),
+                    acc = acc)  
+  res$att <- factor(res$att, levels=c('control','r','g','b'))
+  return(res)
+}  
